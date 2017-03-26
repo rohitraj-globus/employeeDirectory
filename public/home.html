@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>R@J_Employee Directory</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
+    <link rel="icon" href="/images/directory.jpg" type="image/x-icon">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-resource.js"></script>
+    <script src="/controllers/homepage.controller.js"></script>
+ <style>
+    
+
+  </style>
+</head>
+<body ng-app="app" style="background-color:#DAF7A6">
+    <div id="movingNavBar">********<marquee onmouseover="this.stop()" onmouseout="this.start()"> <b>NOTE :</b> <i>You can view Employee directory But admin can only add/delete employee from directory.</n> </marquee>********</div>
+    <div ng-controller="homeController">
+        <nav id="navbarCss" class="navbar">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle hamburgerButon" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>                        
+                    </button>
+                    <a class="navbar-brand">R@J's Employee Directory</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="active" ng-click="viewList()"><a>View Employee</a></li>
+                        <li ng-show="isLoggedIn" ng-click="addList()"><a>Add Employee</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li ng-show="!isLoggedIn" data-toggle="modal" data-target="#myModal"><a id="login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                        <li ng-show="isLoggedIn" ng-click="logout()"><a id="login"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container">
+            <div ng-show="showAdd">
+                <form style="margin-bottom: 10px;" >
+                    <fieldset class="fieldset">
+                        <legend style="width: inherit;font-style: italic;">  Employee information:</legend>
+                        <table>
+                            <tr>
+                                <td class="tableLbl">Employee Name:</td>
+                                <td class="tableVal"><input class="tableInput" type="text" name="Name" placeholder="Enter Employye Name" ng-model="userObj.name" required></td>
+                            </tr>
+                            <tr>
+                                <td class="tableLbl">Email:</td>
+                                <td class="tableVal"><input class="tableInput" type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" name="email" title="Please enter valid email." placeholder="Enter email id" ng-model="userObj.email" required></td>
+                            </tr>
+                            <tr>
+                                <td class="tableLbl">Date Of Birth:</td>
+                                <td class="tableVal"><input class="tableInput" type="date" name="dob" ng-model="userObj.dob" ng-change="calculateAge(userObj.dob)" required></td>
+                            </tr>
+                            <tr>
+                                <td class="tableLbl">Designation:</td>
+                                <td class="tableVal"><input class="tableInput" type="text" name="designation" placeholder="Enter Designation" ng-model="userObj.dept" required></td>
+                            </tr>
+                            <tr>
+                                <td class="tableLbl">Gender:</td>
+                                <td class="tableVal"><input type="radio" value="male" ng-model="userObj.gender" ng-required="!userObj.gender"> Male   <input type="radio" value="female" ng-model="userObj.gender" ng-required="!userObj.gender"> Female<br></td>
+                            </tr>
+                        </table>
+                        
+                        
+                        
+                        <input class="submit" type="submit" value="Add Employee" ng-click="createUser()">
+                    </fieldset>
+                </form>
+            </div>
+            <div ng-show="showList">
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <input type="text" class="searchBox" style="padding-left: 11px;" ng-model="test" placeholder="Search">
+                        <span class="glyphicon glyphicon-search searchIcon"></span>
+                    </input>
+                </div>
+                <div class="table-responsive" style="max-height: 450px">          
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="thead" ng-click="sortColumnBy('$index+1')">#</th>
+                                <th class="thead" ng-click="sortColumnBy('name')">Name</th>
+                                <th class="thead" ng-click="sortColumnBy('email')">Email</th>
+                                <th class="thead" ng-click="sortColumnBy('dob')">DOB</th>
+                                <th class="thead" ng-click="sortColumnBy('dept')">Designation</th>
+                                <th class="thead" ng-click="sortColumnBy('gender')">Gender</th>
+                                <th class="thead" ng-click="sortColumnBy('age')">Age</th>
+                            </tr>
+                        </thead>
+                        <tbody style="overflow-y: auto;">
+                            <tr ng-repeat="user in users | orderBy:columnName:chatReverse | filter:test">
+                                <td>{{$index+1}}.</td>
+                                <td>{{user.name}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.dob | date:'dd/MM/yyyy'}}</td>
+                                <td>{{user.dept}}</td>
+                                <td>{{user.gender}}</td>
+                                <td>{{user.age}} yr</td>
+                                <td ng-show="isLoggedIn"><span class="glyphicon glyphicon-remove" ng-click="deleteUser(user)"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Login Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header"> LOGIN
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        Username: &nbsp<input class="loginWindow" type="text" placeholder="Enter username" ng-model="username" >
+                        Password: &nbsp <input class="loginWindow" type="password" placeholder="Enter password" ng-model="password" ></input>
+                        <h6 class="errorMsg" ng-show="errorMsg"><b>**ENTER VALID CREDENTIAL.</h6>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" style="background-color:yellowgreen" ng-click="ChekAuth(username,password)">Login</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Error Modal -->
+            <div class="modal fade" id="errorModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header"> ALERT:
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="errorMsg"><b>{{message}}</h6>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" style="background-color:yellowgreen" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

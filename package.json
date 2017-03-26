@@ -1,0 +1,19 @@
+{
+  "name": "employee_directory_app",
+  "version": "1.0.5",
+  "description": "employeedirectory-with-angularJs-express-mongodb&nodejs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "employeeDirectoryApp & CURD"
+  ],
+  "author": "Rohit Raj",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.13.3",
+    "mongoose": "^4.7.2"
+  }
+}
